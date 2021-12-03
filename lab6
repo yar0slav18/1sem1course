@@ -1,0 +1,142 @@
+import math
+import matplotlib.pyplot as plt
+
+
+# функция вывода значений из массив с округлением до 3х знаков после запятой
+def mass_printer(mass):
+    for element in mass:
+        print('{:.3f}'.format(element), end=' ')
+
+
+def mass_cleaner(mass):  # Избавление массива от None
+    result = []
+    for i in mass:
+        if i is None:
+            continue
+        else:
+            result.append(i)
+    # Если массив оказался пустым, то вернёт 0, в другом случае результат
+    if len(result) > 0:
+        return result
+    else:
+        return 0
+
+
+# функция рисования графиков
+def plot_data(x_arg, y_arg, legend='f(x)', title='Plot f(x)', x_label='x', y_label='f(x)'):
+    plt.plot(x_arg, y_arg, 'ko-')
+    plt.legend([legend])
+    plt.title(title)
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    plt.savefig('klk')
+
+
+# фция записи значений из массива в одну строку через пробел, принимает массив возвращает строку
+def mass_to_string(mass):
+    string = ''
+    for element in mass:
+        string = string + str(element) + ' '
+    return string
+
+
+# фция ищет питоновскими методами строку в строке 
+def search(mass):
+    to_search = input('\nВведите шаблон для поиска совпадений, числа разделяйте 1-им пробелом\n')
+    in_search = mass_to_string(mass)
+    print('Колличество вхождений шаблона: ', in_search.count(to_search))
+
+
+# ну тут понятно по тексту
+def maks_min_printer(mass, func_name):
+    mass = mass_cleaner(mass)
+    if mass != 0:
+        print(f'\n-----\n{func_name} результаты:')
+        print('\nМаксимальное значение функции {:}: {:.3f}'.format(func_name, max(mass)))
+        print('Минимальное значение функции {:}: {:.3f}'.format(func_name, min(mass)))
+        print('\n', mass_to_string(mass))
+        search(mass)
+    # если массив оказался пустым 
+    else:
+        print(f'\n-----\n{func_name} решений нет')
+
+
+while True:
+    X_mass = []
+    a, x_l, x_u, fcn_num, x_method = 0, 0, 0, 0, 0
+    struct = [[], [], []]  # 0 - G || 1 - F || 2 - Y
+    try:
+        a = float(input('Введите "a": '))
+        x_l, x_u = float(input('Нижняя граница "x": ')), float(input('Верхняя граница "x": '))
+        x_method = int(input('[1 -   Вы введёте шаги | 2 - Вы введёте шаг]: '))
+    except ValueError:
+        print('Enter number, not letter')
+        exit(1)
+
+    x_steps, x_step, x = 0, 0, x_l
+    x_old = x
+    try:
+        if x_method == 1:
+            x_steps = int(input('Введите ЦЕЛОЕ число шагов: '))
+            x_step = (x_u - x_l) / x_steps
+        elif x_method == 2:
+            x_step = float(input('Введите значение шага: '))
+    except ValueError:
+        print('Enter number, not letter')
+        exit(1)
+
+    #  Старт вычислений G
+    x = x_old
+    while x <= x_u:
+        if not math.isclose((4 * a * a + a * x - 5 * x * x), 0, abs_tol=10 ** -1):
+            G = -8 * (12 * a * a + 68 * a * x + 63 * x * x) / (4 * a * a + a * x - 5 * x * x)
+            struct[0].append(G)
+            X_mass.append(x)
+        else:
+            struct[0].append(None)
+            X_mass.append(x)
+        x += x_step
+
+    #  Старт вычислений F
+    X_mass = []
+    x = x_old
+    while x <= x_u:
+        if not math.isclose((math.pi * (40 * a * a - 61 * a * x + 7 * x * x)), 0, abs_tol=10 ** -1):
+            F = math.sin(math.pi * (40*a*-61*a*x+7*x*x))/(math.pi * (40 * a * a - 61 * a * x + 7 * x * x))
+            X_mass.append(x)
+            struct[1].append(F)
+        else:
+            X_mass.append(x)
+            struct[1].append(None)
+        x += x_step
+
+    #  Старт вычислений Y
+    X_mass = []
+    x = x_old
+    while x <= x_u:
+        try:
+            Y = math.acos(-7 * a * a + 40 * a * x + 63 * x * x + 1)
+            X_mass.append(x)
+            struct[2].append(Y)
+        except ValueError:
+            X_mass.append(x)
+            struct[2].append(None)
+        x += x_step
+
+    plot_data(X_mass, struct[0], 'G(x)', 'Plot G(x)', 'x', 'G(x)')
+    maks_min_printer(struct[0], 'G')
+    plot_data(X_mass, struct[1], 'F(x)', 'Plot F(x)', 'x', 'F(x)')
+    maks_min_printer(struct[1], 'F')
+    plot_data(X_mass, struct[2], 'Y(x)', 'Plot Y(x)', 'x', 'Y(x)')
+    maks_min_printer(struct[2], 'Y')
+    while True:
+        try:
+            a = int(input("\nХотите повторить вычисления снова? 1 - Да: "))
+            break
+        except ValueError:
+            print('Ввод не распознан. Повторите еще раз.')
+        continue
+
+    if a != 1:
+        print('Have a nice day! :)')
+        break
