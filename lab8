@@ -1,0 +1,24 @@
+import random
+
+
+# функция проверки нахождения точки в окружности
+def is_point_in_area(point, mid, radius):
+    return (float(mid[0]) - float(point[0])) ** 2 + (float(mid[1]) - float(point[1])) ** 2 <= radius ** 2
+
+
+# функция подсчитывающая кол-во точек входящих в окружность
+def point_counter(points, mid, radius):
+    points_counter = 0
+    for point in points:
+        if is_point_in_area(point, mid, radius):
+            points_counter += 1
+    return points_counter
+
+
+p_q = int(input('Введите кол-во точек: '))
+rad = float(input('Введите радиус: '))
+
+points = [(random.uniform(-10, 10), random.uniform(-10, 10)) for i in range(p_q)]  # генерация множества точек с координатами x, y
+center = (random.uniform(-10, 10), random.uniform(-10, 10))  # выбор случайно точки в виде центра окружности
+
+print(point_counter(points, center, rad))
